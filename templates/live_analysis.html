@@ -1,0 +1,101 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h3>Live Posture Analysis</h3>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <div class="video-container">
+                        <video id="video-element" autoplay playsinline style="display: none;"></video>
+                        <canvas id="output-canvas"></canvas>
+                        <canvas id="skeletonCanvas"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Analysis Controls</h5>
+                    <div class="mb-3">
+                        <label for="sportSelect" class="form-label">Select Sport</label>
+                        <select class="form-select" id="sportSelect">
+                            <option value="general">General</option>
+                            <option value="badminton">Badminton</option>
+                            <option value="tennis">Tennis</option>
+                        </select>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button id="startAnalysis" class="btn btn-primary">Start Analysis</button>
+                        <button id="stopAnalysis" class="btn btn-danger" style="display: none;">Stop Analysis</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h5 class="card-title">Feedback</h5>
+                    <div id="feedbackContainer">
+                        <div class="alert alert-info">
+                            Click "Start Analysis" to begin posture analysis.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.video-container {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+    background-color: #000;
+}
+
+#video-element,
+#output-canvas,
+#skeletonCanvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+#skeletonCanvas {
+    pointer-events: none;
+    z-index: 1;
+}
+
+.feedback-item {
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+}
+
+.feedback-item.good {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.feedback-item.warning {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.feedback-item.error {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+</style>
+
+<script src="{{ url_for('static', filename='js/skeleton.js') }}"></script>
+<script src="{{ url_for('static', filename='js/live_analysis.js') }}"></script>
+{% endblock %} 

@@ -1,0 +1,177 @@
+{% extends "layout.html" %}
+
+{% block title %}Profile - AI Sports Coach{% endblock %}
+
+{% block additional_css %}
+<style>
+    .profile-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .profile-header {
+        margin-bottom: 2rem;
+    }
+    
+    .profile-card {
+        background-color: white;
+        border-radius: 0.5rem;
+        box-shadow: var(--shadow);
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .profile-section {
+        margin-bottom: 2rem;
+    }
+    
+    .profile-section h3 {
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid var(--light-gray);
+    }
+    
+    .avatar-section {
+        display: flex;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+    
+    .avatar {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background-color: var(--primary-color);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        font-weight: 600;
+        margin-right: 2rem;
+    }
+    
+    .user-info h3 {
+        margin-bottom: 0.5rem;
+        border-bottom: none;
+    }
+    
+    .joined-date {
+        color: var(--dark-gray);
+    }
+    
+    .form-row {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    @media (max-width: 768px) {
+        .form-row {
+            flex-direction: column;
+        }
+        
+        .avatar-section {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .avatar {
+            margin-right: 0;
+            margin-bottom: 1rem;
+        }
+    }
+    
+    .help-text {
+        color: var(--dark-gray);
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+    
+    .why-link {
+        color: var(--primary-color);
+        cursor: pointer;
+        margin-left: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <div class="profile-header">
+        <h2>Profile Settings</h2>
+        <p>Update your personal information to get more accurate analysis and recommendations</p>
+    </div>
+    
+    <div class="profile-card">
+        <div class="avatar-section">
+            <div class="avatar">
+                {{ current_user.username[0].upper() }}
+            </div>
+            
+            <div class="user-info">
+                <h3>{{ current_user.username }}</h3>
+                <p class="joined-date">Member since {{ current_user.created_at.strftime('%B %Y') }}</p>
+                <p>{{ current_user.email }}</p>
+            </div>
+        </div>
+        
+        <div class="profile-section">
+            <h3>Physical Details</h3>
+            
+            <form method="POST" action="{{ url_for('profile') }}">
+                {{ form.hidden_tag() }}
+                
+                <div class="form-row">
+                    <div class="form-group flex-grow-1">
+                        <label for="age" class="form-label">Age</label>
+                        {{ form.age(class="form-control", type="number") }}
+                        <small class="help-text">Used to calibrate analysis based on age-related factors</small>
+                    </div>
+                    
+                    <div class="form-group flex-grow-1">
+                        <label for="height" class="form-label">Height (cm)</label>
+                        {{ form.height(class="form-control", type="number", step="0.1") }}
+                    </div>
+                    
+                    <div class="form-group flex-grow-1">
+                        <label for="weight" class="form-label">Weight (kg)</label>
+                        {{ form.weight(class="form-control", type="number", step="0.1") }}
+                        <small class="help-text">Helps calculate biomechanical forces
+                            <span class="why-link" data-bs-toggle="tooltip" title="Height and weight help us analyze your movements more accurately and calculate appropriate forces on joints">
+                                <i class="fas fa-question-circle"></i>
+                            </span>
+                        </small>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group flex-grow-1">
+                        <label for="primary_sport" class="form-label">Primary Sport</label>
+                        {{ form.primary_sport(class="form-select") }}
+                    </div>
+                    
+                    <div class="form-group flex-grow-1">
+                        <label for="experience_level" class="form-label">Experience Level</label>
+                        {{ form.experience_level(class="form-select") }}
+                        <small class="help-text">Tailors feedback to your skill level</small>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-4">
+                    {{ form.submit(class="btn btn-primary") }}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block additional_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize tooltips
+        initializeTooltips();
+    });
+</script>
+{% endblock %}

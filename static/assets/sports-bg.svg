@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1000" viewBox="0 0 1000 1000">
+  <defs>
+    <pattern id="sports-pattern" x="0" y="0" width="200" height="200" patternUnits="userSpaceOnUse">
+      <!-- Basketball -->
+      <circle cx="50" cy="50" r="20" fill="none" stroke="#888" stroke-width="1" />
+      <path d="M30,50 L70,50 M50,30 L50,70" stroke="#888" stroke-width="1" fill="none" />
+      <path d="M35,35 C42,42 58,42 65,35 M35,65 C42,58 58,58 65,65" stroke="#888" stroke-width="1" fill="none" />
+      
+      <!-- Tennis racket -->
+      <ellipse cx="150" cy="50" rx="15" ry="20" fill="none" stroke="#888" stroke-width="1" />
+      <line x1="150" y1="70" x2="150" y2="90" stroke="#888" stroke-width="2" />
+      <path d="M140,45 L160,55 M140,55 L160,45" stroke="#888" stroke-width="0.5" />
+      <path d="M145,40 L155,60 M145,60 L155,40" stroke="#888" stroke-width="0.5" />
+      
+      <!-- Soccer ball -->
+      <circle cx="50" cy="150" r="20" fill="none" stroke="#888" stroke-width="1" />
+      <path d="M45,132 L55,132 L60,140 L55,150 L45,150 L40,140 Z" fill="none" stroke="#888" stroke-width="1" />
+      <path d="M40,140 L30,145 L30,155 L40,160 L50,158 M60,140 L70,145 L70,155 L60,160 L50,158" fill="none" stroke="#888" stroke-width="1" />
+      
+      <!-- Badminton -->
+      <circle cx="150" cy="145" r="8" fill="none" stroke="#888" stroke-width="1" />
+      <path d="M150,153 L150,170" stroke="#888" stroke-width="2" />
+      <path d="M150,137 L145,132 L155,132 Z" fill="none" stroke="#888" stroke-width="1" />
+    </pattern>
+  </defs>
+  
+  <rect x="0" y="0" width="100%" height="100%" fill="url(#sports-pattern)" />
+</svg>

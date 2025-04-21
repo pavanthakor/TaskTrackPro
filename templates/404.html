@@ -1,0 +1,53 @@
+{% extends "layout.html" %}
+
+{% block title %}Page Not Found - AI Sports Coach{% endblock %}
+
+{% block additional_css %}
+<style>
+    .error-container {
+        text-align: center;
+        padding: 3rem 1rem;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .error-code {
+        font-size: 8rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+        line-height: 1;
+    }
+    
+    .error-message {
+        font-size: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .error-illustration {
+        max-width: 300px;
+        margin: 2rem auto;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="error-container">
+    <div class="error-code">404</div>
+    <h2 class="error-message">Page Not Found</h2>
+    <p>The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.</p>
+    
+    <div class="error-illustration">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+            <circle cx="100" cy="100" r="90" fill="none" stroke="#e9ecef" stroke-width="10" />
+            <circle cx="70" cy="80" r="10" fill="#2c7be5" />
+            <circle cx="130" cy="80" r="10" fill="#2c7be5" />
+            <path d="M70,130 Q100,100 130,130" fill="none" stroke="#2c7be5" stroke-width="8" stroke-linecap="round" />
+        </svg>
+    </div>
+    
+    <a href="{{ url_for('index') }}" class="btn btn-primary">
+        <i class="fas fa-home"></i> Back to Home
+    </a>
+</div>
+{% endblock %}

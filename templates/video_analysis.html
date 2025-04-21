@@ -1,0 +1,183 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Video Analysis</h2>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Live Video Feed</h5>
+                    <div class="video-container">
+                        <img src="{{ url_for('routes.video_feed') }}" class="img-fluid" alt="Video Feed">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Analysis Controls</h5>
+                    <form id="analysisForm">
+                        <div class="mb-3">
+                            <label for="sport" class="form-label">Select Sport</label>
+                            <select class="form-select" id="sport" name="sport">
+                                <option value="general">General Training</option>
+                                <option value="badminton">Badminton</option>
+                                <option value="football">Football</option>
+                                <option value="running">Running</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="analysisType" class="form-label">Analysis Type</label>
+                            <select class="form-select" id="analysisType" name="analysis_type">
+                                <option value="live">Live Analysis</option>
+                                <option value="recorded">Recorded Analysis</option>
+                            </select>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Start Analysis</button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h5 class="card-title">Feedback</h5>
+                    <div id="feedbackContainer">
+                        <div class="alert alert-info">
+                            Select a sport and start analysis to see feedback
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.video-container {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%; /* 16:9 Aspect Ratio */
+    background-color: #000;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.video-container img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+#feedbackContainer {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.feedback-item {
+    padding: 10px;
+    margin-bottom: 5px;
+    border-radius: 4px;
+}
+
+.feedback-item.good {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.feedback-item.warning {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.feedback-item.error {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const analysisForm = document.getElementById('analysisForm');
+    const feedbackContainer = document.getElementById('feedbackContainer');
+    let analysisInterval = null;
+    
+    analysisForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Clear previous feedback
+        feedbackContainer.innerHTML = '';
+        
+        // Get form data
+        const formData = new FormData(analysisForm);
+        
+        // Start analysis
+        startAnalysis(formData);
+    });
+    
+    function startAnalysis(formData) {
+        // Clear any existing interval
+        if (analysisInterval) {
+            clearInterval(analysisInterval);
+        }
+        
+        // Start new analysis interval
+        analysisInterval = setInterval(() => {
+            fetch('/analyze_posture', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    showError(data.error);
+                    return;
+                }
+                
+                updateFeedback(data.feedback);
+            })
+            .catch(error => {
+                showError('Error analyzing posture: ' + error.message);
+            });
+        }, 1000); // Analyze every second
+    }
+    
+    function updateFeedback(feedback) {
+        feedbackContainer.innerHTML = '';
+        
+        feedback.forEach(([message, color]) => {
+            const feedbackItem = document.createElement('div');
+            feedbackItem.className = 'feedback-item';
+            
+            // Determine feedback type based on color
+            if (color === 'green') {
+                feedbackItem.classList.add('good');
+            } else if (color === 'yellow') {
+                feedbackItem.classList.add('warning');
+            } else {
+                feedbackItem.classList.add('error');
+            }
+            
+            feedbackItem.textContent = message;
+            feedbackContainer.appendChild(feedbackItem);
+        });
+    }
+    
+    function showError(message) {
+        feedbackContainer.innerHTML = `
+            <div class="alert alert-danger">
+                ${message}
+            </div>
+        `;
+    }
+});
+</script>
+{% endblock %} 

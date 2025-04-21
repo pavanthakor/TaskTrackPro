@@ -1,0 +1,275 @@
+{% extends "layout.html" %}
+
+{% block title %}Analysis Results - AI Sports Coach{% endblock %}
+
+{% block additional_css %}
+<style>
+    .analysis-container {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .analysis-header {
+        margin-bottom: 2rem;
+    }
+
+    .risk-indicator {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.5rem 1rem;
+        border-radius: 2rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .risk-indicator i {
+        margin-right: 0.5rem;
+    }
+
+    .risk-low {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .risk-medium {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+
+    .risk-high {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+    .video-analysis-section {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    @media (max-width: 768px) {
+        .video-analysis-section {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .video-container {
+        position: relative;
+        width: 100%;
+        padding-top: 56.25%; /* 16:9 Aspect Ratio */
+        background-color: #000;
+    }
+
+    .video-container video {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    .visualization-container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        min-height: 300px;
+        background-color: #f8f9fa;
+        border-radius: 0.5rem;
+        overflow: hidden;
+    }
+
+    #poseVisualization {
+        width: 100%;
+        height: 100%;
+    }
+
+    .playback-controls {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+
+    .analysis-feedback, .analysis-recommendations {
+        background-color: white;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: var(--shadow);
+    }
+
+    .analysis-feedback h3, .analysis-recommendations h3 {
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid var(--light-gray);
+    }
+
+    .recommendation-item {
+        margin-bottom: 0.75rem;
+        padding-left: 1.5rem;
+        position: relative;
+    }
+
+    .recommendation-item:before {
+        content: '•';
+        position: absolute;
+        left: 0;
+        color: var(--primary-color);
+        font-weight: bold;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    @media (max-width: 576px) {
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .action-buttons .btn {
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+    }
+
+    .feedback-section .list-group-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .recommendations-section .list-group-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .progress {
+        height: 25px;
+    }
+
+    .progress-bar {
+        font-size: 14px;
+        line-height: 25px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4>Video Analysis</h4>
+                </div>
+                <div class="card-body">
+                    <div class="video-container">
+                        <video id="analysisVideo" controls class="w-100">
+                            <source src="{{ url_for('static', filename='uploads/' + analysis.filename) }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4>Movement Analysis</h4>
+                </div>
+                <div class="card-body">
+                    <div class="analysis-feedback">
+                        {% if analysis.result %}
+                            {% set result = analysis.result|from_json %}
+                            <div class="feedback-section mb-4">
+                                <h5>Form and Technique Analysis</h5>
+                                <ul class="list-group">
+                                    {% for item in result.feedback %}
+                                        <li class="list-group-item">
+                                            <i class="fas fa-{{ 'check-circle text-success' if item.status == 'good' else 'exclamation-circle text-warning' }}"></i>
+                                            {{ item.message }}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+
+                            <div class="injury-risk-section mb-4">
+                                <h5>Injury Risk Assessment</h5>
+                                <div class="progress mb-2">
+                                    <div class="progress-bar {{ 'bg-success' if result.injury_risk.risk_level == 'low' else 'bg-warning' if result.injury_risk.risk_level == 'medium' else 'bg-danger' }}" 
+                                         role="progressbar" 
+                                         style="width: {{ result.injury_risk.risk_percentage }}%">
+                                        {{ result.injury_risk.risk_percentage }}%
+                                    </div>
+                                </div>
+                                <p class="text-muted">{{ result.injury_risk.message }}</p>
+                            </div>
+
+                            <div class="recommendations-section">
+                                <h5>Recommendations</h5>
+                                <ul class="list-group">
+                                    {% for rec in result.injury_risk.recommendations %}
+                                        <li class="list-group-item">
+                                            <i class="fas fa-arrow-right text-primary"></i>
+                                            {{ rec }}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info">
+                                No analysis results available yet. Please try again later.
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4>Analysis Details</h4>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-4">Sport</dt>
+                        <dd class="col-sm-8">{{ analysis.sport.name }}</dd>
+                        
+                        <dt class="col-sm-4">Date</dt>
+                        <dd class="col-sm-8">{{ analysis.timestamp.strftime('%Y-%m-%d %H:%M') }}</dd>
+                        
+                        <dt class="col-sm-4">Duration</dt>
+                        <dd class="col-sm-8">{{ analysis.duration }} seconds</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h4>Actions</h4>
+                </div>
+                <div class="card-body">
+                    <a href="{{ url_for('upload') }}" class="btn btn-primary btn-block mb-2">
+                        <i class="fas fa-upload"></i> Upload New Video
+                    </a>
+                    <a href="{{ url_for('training_log') }}" class="btn btn-outline-primary btn-block mb-2">
+                        <i class="fas fa-clipboard-list"></i> Log Training
+                    </a>
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary btn-block">
+                        <i class="fas fa-home"></i> Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block additional_js %}
+<script src="{{ url_for('static', filename='js/analysis.js') }}"></script>
+{% endblock %}

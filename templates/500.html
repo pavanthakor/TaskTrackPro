@@ -1,0 +1,54 @@
+{% extends "layout.html" %}
+
+{% block title %}Server Error - AI Sports Coach{% endblock %}
+
+{% block additional_css %}
+<style>
+    .error-container {
+        text-align: center;
+        padding: 3rem 1rem;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .error-code {
+        font-size: 8rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+        line-height: 1;
+    }
+    
+    .error-message {
+        font-size: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .error-illustration {
+        max-width: 300px;
+        margin: 2rem auto;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="error-container">
+    <div class="error-code">500</div>
+    <h2 class="error-message">Server Error</h2>
+    <p>Sorry, something went wrong on our end. We're working to fix the issue. Please try again later.</p>
+    
+    <div class="error-illustration">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+            <circle cx="100" cy="100" r="90" fill="none" stroke="#e9ecef" stroke-width="10" />
+            <circle cx="70" cy="80" r="10" fill="#dc3545" />
+            <circle cx="130" cy="80" r="10" fill="#dc3545" />
+            <path d="M65,130 Q100,150 135,130" fill="none" stroke="#dc3545" stroke-width="8" stroke-linecap="round" />
+            <path d="M90,50 L110,50 L100,65 Z" fill="#dc3545" />
+        </svg>
+    </div>
+    
+    <a href="{{ url_for('index') }}" class="btn btn-primary">
+        <i class="fas fa-home"></i> Back to Home
+    </a>
+</div>
+{% endblock %}

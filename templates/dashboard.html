@@ -1,0 +1,293 @@
+{% extends "layout.html" %}
+
+{% block title %}Dashboard - AI Sports Coach{% endblock %}
+
+{% block additional_css %}
+<style>
+    .welcome-banner {
+        background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+        color: white;
+        padding: 2rem;
+        border-radius: 0.5rem;
+        margin-bottom: 2rem;
+        box-shadow: var(--shadow);
+    }
+
+    .welcome-banner h2 {
+        color: white;
+        margin-bottom: 0.5rem;
+    }
+
+    .quick-actions {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .quick-action-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem 1rem;
+        border-radius: 0.5rem;
+        background-color: white;
+        box-shadow: var(--shadow);
+        transition: var(--transition);
+        text-align: center;
+    }
+
+    .quick-action-btn:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        text-decoration: none;
+    }
+
+    .quick-action-icon {
+        font-size: 2rem;
+        margin-bottom: 0.75rem;
+        color: var(--primary-color);
+    }
+
+    .chart-container {
+        position: relative;
+        height: 250px;
+        margin-bottom: 1.5rem;
+    }
+
+    .profile-alert {
+        background-color: #fff3cd;
+        border-left: 4px solid #ffc107;
+        padding: 1rem;
+        margin-bottom: 2rem;
+        border-radius: 0.25rem;
+    }
+
+    .activity-title {
+        position: relative;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .activity-title:after {
+        content: '';
+        flex: 1;
+        height: a2px;
+        background-color: var(--light-gray);
+        margin-left: 1rem;
+    }
+
+    .no-data-message {
+        padding: 3rem;
+        text-align: center;
+        color: var(--dark-gray);
+        background-color: var(--light-gray);
+        border-radius: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Welcome Banner -->
+<div class="welcome-banner">
+    <h2>Welcome back, {{ current_user.username }}!</h2>
+    <p>Track your progress, analyze your form, and improve your performance.</p>
+</div>
+
+<!-- Profile Alert (if needed) -->
+{% if not profile_complete %}
+<div class="profile-alert">
+    <div class="d-flex align-items-center">
+        <i class="fas fa-exclamation-circle fa-2x me-3" style="color: #856404;"></i>
+        <div>
+            <strong>Complete your profile</strong>
+            <p class="mb-0">Add your physical details and sport preferences to get more accurate analysis and recommendations.</p>
+        </div>
+        <a href="{{ url_for('profile') }}" class="btn btn-warning ms-auto">Update Profile</a>
+    </div>
+</div>
+{% endif %}
+
+<!-- Quick Actions -->
+<h3>Quick Actions</h3>
+<div class="quick-actions">
+    <a href="{{ url_for('upload') }}" class="quick-action-btn">
+        <div class="quick-action-icon">
+            <i class="fas fa-video"></i>
+        </div>
+        <span>Upload Video</span>
+    </a>
+    
+    <a href="{{ url_for('training_log') }}" class="quick-action-btn">
+        <div class="quick-action-icon">
+            <i class="fas fa-clipboard-list"></i>
+        </div>
+        <span>Log Training</span>
+    </a>
+    
+    <a href="{{ url_for('sports') }}" class="quick-action-btn">
+        <div class="quick-action-icon">
+            <i class="fas fa-running"></i>
+        </div>
+        <span>Browse Sports</span>
+    </a>
+    
+    <a href="{{ url_for('profile') }}" class="quick-action-btn">
+        <div class="quick-action-icon">
+            <i class="fas fa-user-cog"></i>
+        </div>
+        <span>Edit Profile</span>
+    </a>
+</div>
+
+<!-- Stats Overview -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="mb-0">Training Intensity</h5>
+            </div>
+            <div class="card-body">
+                {% if logs %}
+                <div class="chart-container">
+                    <canvas id="intensityChart"></canvas>
+                </div>
+                {% else %}
+                <div class="no-data-message">
+                    <i class="fas fa-chart-line fa-3x mb-3 text-muted"></i>
+                    <p>No training data yet</p>
+                    <a href="{{ url_for('training_log') }}" class="btn btn-sm btn-primary">Log Your Training</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="mb-0">Injury Risk Analysis</h5>
+            </div>
+            <div class="card-body">
+                {% if analyses %}
+                <div class="chart-container">
+                    <canvas id="riskFactorChart"></canvas>
+                </div>
+                {% else %}
+                <div class="no-data-message">
+                    <i class="fas fa-heartbeat fa-3x mb-3 text-muted"></i>
+                    <p>No analysis data yet</p>
+                    <a href="{{ url_for('upload') }}" class="btn btn-sm btn-primary">Upload a Video</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activity -->
+<h3 class="activity-title">Recent Activity</h3>
+<div id="recentActivity">
+    {% if logs or analyses %}
+        {% if analyses %}
+            {% for analysis in analyses %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h5 class="card-title">Video Analysis - {{ analysis.sport.name }}</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">{{ analysis.upload_date.strftime('%B %d, %Y') }}</h6>
+                            
+                            <div class="mt-2">
+                                <span class="risk-level risk-{{ analysis.injury_risk_level.lower() }}">
+                                    {{ analysis.injury_risk_level }} Risk
+                                </span>
+                            </div>
+                        </div>
+                        <a href="{{ url_for('analysis', analysis_id=analysis.id) }}" class="btn btn-sm btn-outline-primary">
+                            View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% endif %}
+        
+        {% if logs %}
+            {% for log in logs %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h5 class="card-title">Training Log - {{ log.sport.name }}</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">{{ log.date.strftime('%B %d, %Y') }}</h6>
+                            
+                            <div class="mt-2">
+                                Duration: {{ log.duration }} minutes
+                                <div class="progress mt-1 mb-2" style="height: 8px; width: 200px;">
+                                    <div class="progress-bar" style="width: {{ (log.duration / 120) * 100 }}%"></div>
+                                </div>
+                                
+                                Intensity: {{ log.intensity }}/10
+                                <div class="progress mt-1" style="height: 8px; width: 200px;">
+                                    <div class="progress-bar" style="width: {{ (log.intensity / 10) * 100 }}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="{{ url_for('training_log') }}" class="btn btn-sm btn-outline-primary">
+                            View All Logs
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% endif %}
+    {% else %}
+    <div class="no-data-message">
+        <i class="fas fa-calendar-alt fa-3x mb-3 text-muted"></i>
+        <p>No activity yet</p>
+        <div>
+            <a href="{{ url_for('upload') }}" class="btn btn-primary me-2">Upload a Video</a>
+            <a href="{{ url_for('training_log') }}" class="btn btn-outline-primary">Log Training</a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Hidden data for charts -->
+{% if logs %}
+<script id="trainingData" type="application/json">
+    [
+        {% for log in logs %}
+        {
+            "date": "{{ log.date.strftime('%m/%d') }}",
+            "duration": {{ log.duration }},
+            "intensity": {{ log.intensity }},
+            "sport": "{{ log.sport.name }}"
+        }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ]
+</script>
+{% endif %}
+
+{% if analyses %}
+<script id="analysisData" type="application/json">
+    [
+        {% for analysis in analyses %}
+        {
+            "id": {{ analysis.id }},
+            "date": "{{ analysis.upload_date.strftime('%m/%d') }}",
+            "sport": "{{ analysis.sport.name }}",
+            "riskLevel": "{{ analysis.injury_risk_level }}"
+        }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ]
+</script>
+{% endif %}
+{% endblock %}
+
+{% block additional_js %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

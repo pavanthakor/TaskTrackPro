@@ -1,0 +1,209 @@
+{% extends "layout.html" %}
+
+{% block title %}Sports - AI Sports Coach{% endblock %}
+
+{% block additional_css %}
+<style>
+    .sports-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+    .sports-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+    
+    .sports-header h2 {
+        margin-bottom: 1rem;
+    }
+    
+    .sports-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 2rem;
+    }
+    
+    .sport-card {
+        background-color: white;
+        border-radius: 1rem;
+        overflow: hidden;
+        box-shadow: var(--shadow);
+        transition: var(--transition);
+        position: relative;
+        cursor: pointer;
+    }
+    
+    .sport-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    .sport-image {
+        height: 200px;
+        background-position: center;
+        background-size: cover;
+        position: relative;
+    }
+    
+    .sport-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(0deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 50%);
+    }
+    
+    .sport-content {
+        padding: 1.5rem;
+    }
+    
+    .sport-name {
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+    }
+    
+    .sport-description {
+        color: var(--dark-gray);
+        margin-bottom: 1.5rem;
+    }
+    
+    .sport-actions {
+        display: flex;
+        justify-content: space-between;
+    }
+    
+    .sport-icon {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        width: 50px;
+        height: 50px;
+        background-color: rgba(255, 255, 255, 0.9);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: var(--primary-color);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="sports-container">
+    <div class="sports-header">
+        <h2>Choose Your Sport</h2>
+        <p>Select a sport for video analysis and performance feedback</p>
+    </div>
+    
+    <div class="sports-grid">
+        {% for sport in sports %}
+        <div class="sport-card" data-sport-id="{{ sport.id }}">
+            {% set sport_name = sport.name|lower if sport.name else 'general' %}
+            {% if sport_name == 'basketball' %}
+                <div class="sport-image" style="background-image: url('https://images.unsplash.com/photo-1546519638-68e109498ffc?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80')">
+                    <div class="sport-overlay"></div>
+                    <div class="sport-icon">
+                        <i class="fas fa-basketball-ball"></i>
+                    </div>
+                </div>
+                <div class="sport-content">
+                    <h3 class="sport-name">{{ sport.name }}</h3>
+                    <p class="sport-description">Analyze your shooting form, jump technique, and overall basketball movements</p>
+                    <div class="sport-actions">
+                        <a href="{{ url_for('upload', sport=sport.id) }}" class="btn btn-primary">Upload Video</a>
+                        <a href="{{ url_for('training_log') }}" class="btn btn-outline-primary">Log Training</a>
+                    </div>
+                </div>
+            {% elif sport_name == 'tennis' %}
+                <div class="sport-image" style="background-image: url('https://images.unsplash.com/photo-1587280501635-68a0e82cd5ff?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80')">
+                    <div class="sport-overlay"></div>
+                    <div class="sport-icon">
+                        <i class="fas fa-table-tennis"></i>
+                    </div>
+                </div>
+                <div class="sport-content">
+                    <h3 class="sport-name">{{ sport.name }}</h3>
+                    <p class="sport-description">Improve your serve, forehand, backhand techniques and prevent tennis elbow</p>
+                    <div class="sport-actions">
+                        <a href="{{ url_for('upload', sport=sport.id) }}" class="btn btn-primary">Upload Video</a>
+                        <a href="{{ url_for('training_log') }}" class="btn btn-outline-primary">Log Training</a>
+                    </div>
+                </div>
+            {% elif sport_name == 'football' %}
+                <div class="sport-image" style="background-image: url('https://images.unsplash.com/photo-1575361204480-aadea25e6e68?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80')">
+                    <div class="sport-overlay"></div>
+                    <div class="sport-icon">
+                        <i class="fas fa-futbol"></i>
+                    </div>
+                </div>
+                <div class="sport-content">
+                    <h3 class="sport-name">{{ sport.name }}</h3>
+                    <p class="sport-description">Analyze your kicking technique, running form, and avoid common football injuries</p>
+                    <div class="sport-actions">
+                        <a href="{{ url_for('upload', sport=sport.id) }}" class="btn btn-primary">Upload Video</a>
+                        <a href="{{ url_for('training_log') }}" class="btn btn-outline-primary">Log Training</a>
+                    </div>
+                </div>
+            {% elif sport_name == 'badminton' %}
+                <div class="sport-image" style="background-image: url('https://images.unsplash.com/photo-1626151453023-55e1ab432dcb?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80')">
+                    <div class="sport-overlay"></div>
+                    <div class="sport-icon">
+                        <i class="fas fa-table-tennis"></i>
+                    </div>
+                </div>
+                <div class="sport-content">
+                    <h3 class="sport-name">{{ sport.name }}</h3>
+                    <p class="sport-description">Perfect your smash, improve footwork, and prevent shoulder injuries</p>
+                    <div class="sport-actions">
+                        <a href="{{ url_for('upload', sport=sport.id) }}" class="btn btn-primary">Upload Video</a>
+                        <a href="{{ url_for('training_log') }}" class="btn btn-outline-primary">Log Training</a>
+                    </div>
+                </div>
+            {% elif sport_name == 'running' %}
+                <div class="sport-image" style="background-image: url('https://images.unsplash.com/photo-1539794830467-1f18503e577a?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80')">
+                    <div class="sport-overlay"></div>
+                    <div class="sport-icon">
+                        <i class="fas fa-running"></i>
+                    </div>
+                </div>
+                <div class="sport-content">
+                    <h3 class="sport-name">{{ sport.name }}</h3>
+                    <p class="sport-description">Analyze your running form, posture, and prevent common running injuries</p>
+                    <div class="sport-actions">
+                        <a href="{{ url_for('upload', sport=sport.id) }}" class="btn btn-primary">Upload Video</a>
+                        <a href="{{ url_for('training_log') }}" class="btn btn-outline-primary">Log Training</a>
+                    </div>
+                </div>
+            {% else %}
+                <div class="sport-image" style="background-image: url('https://images.unsplash.com/photo-1517649763962-0c623066013b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80')">
+                    <div class="sport-overlay"></div>
+                    <div class="sport-icon">
+                        <i class="fas fa-dumbbell"></i>
+                    </div>
+                </div>
+                <div class="sport-content">
+                    <h3 class="sport-name">{{ sport.name }}</h3>
+                    <p class="sport-description">Analyze your form and get personalized feedback to improve performance</p>
+                    <div class="sport-actions">
+                        <a href="{{ url_for('upload', sport=sport.id) }}" class="btn btn-primary">Upload Video</a>
+                        <a href="{{ url_for('training_log') }}" class="btn btn-outline-primary">Log Training</a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block additional_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Setup sport card click handler
+        setupSportCards();
+    });
+</script>
+{% endblock %}

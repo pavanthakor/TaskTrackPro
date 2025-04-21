@@ -1,0 +1,382 @@
+{% extends "layout.html" %}
+
+{% block title %}Training Log - AI Sports Coach{% endblock %}
+
+{% block additional_css %}
+<style>
+    /* Force dropdown to appear above all */
+    select.form-select {
+        position: relative;
+        z-index: 9999 !important;
+        background-color: white;
+    }
+
+    /* Fix container stacking context */
+    .training-card,
+    .training-form,
+    .form-group {
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Ensure parent has no clipping/overflow hidden */
+    .training-card,
+    .training-form,
+    .form-group {
+        overflow: visible;
+    }
+
+    .training-container {
+        max-width: 800px;
+        margin: 0 auto;
+        position: relative;
+    }
+
+    .training-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .training-card {
+        border-radius: 0.5rem;
+        box-shadow: var(--shadow);
+        background-color: white;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        position: relative;
+    }
+
+    .training-form {
+        margin-top: 1.5rem;
+    }
+
+    .form-group {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-select {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid var(--medium-gray);
+        border-radius: 0.25rem;
+        background-color: white;
+        cursor: pointer;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236c757d' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 0.75rem center;
+        background-size: 16px 12px;
+    }
+
+    .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.25rem rgba(44, 123, 229, 0.25);
+        outline: none;
+    }
+
+    .form-select option {
+        padding: 0.5rem;
+        position: relative;
+        z-index: 9999;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid var(--medium-gray);
+        border-radius: 0.25rem;
+    }
+
+    .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.25rem rgba(44, 123, 229, 0.25);
+        outline: none;
+    }
+
+    .btn-primary {
+        width: 100%;
+        padding: 0.75rem;
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 0.25rem;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .btn-primary:hover {
+        background-color: var(--primary-dark);
+    }
+
+    .log-list {
+        margin-top: 2rem;
+    }
+
+    .log-item {
+        border-left: 4px solid var(--primary-color);
+        padding: 1.5rem;
+        background-color: white;
+        border-radius: 0.5rem;
+        box-shadow: var(--shadow);
+        margin-bottom: 1rem;
+    }
+
+    .log-item-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .log-item-title {
+        font-weight: 600;
+        color: var(--primary-color);
+    }
+
+    .log-item-date {
+        color: var(--dark-gray);
+        font-size: 0.9rem;
+    }
+
+    .log-item-content {
+        margin-bottom: 1rem;
+    }
+
+    .log-item-actions {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .log-history {
+        margin-top: 3rem;
+    }
+
+    .log-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .log-table th, .log-table td {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid var(--light-gray);
+    }
+
+    .log-table th {
+        text-align: left;
+        font-weight: 600;
+        background-color: var(--light-gray);
+    }
+
+    .log-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .log-table tr:hover {
+        background-color: rgba(0, 0, 0, 0.02);
+    }
+
+    .intensity-badge {
+        display: inline-block;
+        width: 30px;
+        height: 30px;
+        line-height: 30px;
+        text-align: center;
+        border-radius: 50%;
+        color: white;
+        font-weight: 600;
+    }
+
+    .intensity-low {
+        background-color: #28a745;
+    }
+
+    .intensity-medium {
+        background-color: #ffc107;
+    }
+
+    .intensity-high {
+        background-color: #dc3545;
+    }
+
+    .symptoms-note {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        background-color: #f8d7da;
+        color: #721c24;
+        font-size: 0.875rem;
+    }
+
+    .no-logs-message {
+        padding: 3rem;
+        text-align: center;
+        color: var(--dark-gray);
+        background-color: var(--light-gray);
+        border-radius: 0.5rem;
+        margin-top: 2rem;
+    }
+
+    .date-input-group {
+        position: relative;
+    }
+
+    .date-input-group i {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--dark-gray);
+        pointer-events: none;
+    }
+
+    body {
+        overflow: visible !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="training-container">
+    <div class="training-header">
+        <h2>Training Log</h2>
+        <p>Keep track of your training sessions to get better insights and injury prevention advice.</p>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-5">
+            <div class="training-card">
+                <div class="training-form-section">
+                    <h3>Add New Log</h3>
+
+                    <form method="POST" action="{{ url_for('training_log') }}" id="trainingLogForm">
+                        {{ form.hidden_tag() }}
+
+                        <div class="form-group mb-3">
+                            <label for="sport" class="form-label">Sport</label>
+                            <select name="sport" id="sport" class="form-select" required>
+                                <option value="">-- Select a sport --</option>
+                                <option value="badminton">Badminton</option>
+                                <option value="tennis">Tennis</option>
+                                <option value="cricket">Cricket</option>
+                                <option value="football">Football</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="date" class="form-label">Date</label>
+                            <div class="date-input-group">
+                                {{ form.date(class="form-control", type="date") }}
+                                <i class="fas fa-calendar"></i>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group flex-grow-1">
+                                <label for="duration" class="form-label">Duration (minutes)</label>
+                                {{ form.duration(class="form-control", type="number", min="1", max="1440") }}
+                            </div>
+
+                            <div class="form-group flex-grow-1">
+                                <label for="intensity" class="form-label">Intensity (1-10)</label>
+                                {{ form.intensity(class="form-select") }}
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="symptoms" class="form-label">Symptoms or Pain (if any)</label>
+                            {{ form.symptoms(class="form-control", rows="2", placeholder="Describe any discomfort or pain...") }}
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label for="notes" class="form-label">Notes</label>
+                            {{ form.notes(class="form-control", rows="3", placeholder="Additional notes about your training session...") }}
+                        </div>
+
+                        <div class="text-center">
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <div class="log-history">
+                <h3>Training History</h3>
+
+                {% if logs %}
+                <div class="table-responsive">
+                    <table class="log-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Sport</th>
+                                <th>Duration</th>
+                                <th>Intensity</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in logs %}
+                            <tr>
+                                <td>{{ log.date.strftime('%b %d, %Y') }}</td>
+                                <td>{{ log.sport.name }}</td>
+                                <td>{{ log.duration }} min</td>
+                                <td>
+                                    <span class="intensity-badge 
+                                        {% if log.intensity <= 3 %}intensity-low
+                                        {% elif log.intensity <= 7 %}intensity-medium
+                                        {% else %}intensity-high{% endif %}">
+                                        {{ log.intensity }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if log.symptoms %}
+                                    <span class="symptoms-note" title="{{ log.symptoms }}">
+                                        <i class="fas fa-exclamation-circle"></i> Symptoms
+                                    </span>
+                                    {% endif %}
+
+                                    {% if log.notes %}
+                                    <span class="ms-2 text-muted small">{{ log.notes|truncate(30) }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="no-logs-message">
+                    <i class="fas fa-clipboard-list fa-3x mb-3 text-muted"></i>
+                    <p>No training logs yet</p>
+                    <p class="text-muted">Use the form to add your first training session</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block additional_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize date pickers
+        initDatePickers();
+
+        // Form validation
+        const form = document.getElementById('trainingLogForm');
+        if (form) {
+            form.addEventListener('submit', function(event) {
+                if (!validateForm('trainingLogForm')) {
+                    event.preventDefault();
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

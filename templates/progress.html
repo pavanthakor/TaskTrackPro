@@ -1,0 +1,113 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Track Your Progress</h2>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Add New Progress</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('progress') }}" id="progressForm">
+                        {{ form.hidden_tag() }}
+                        <div class="form-group">
+                            {{ form.sport.label }}
+                            {{ form.sport(class="form-control") }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.metric_name.label }}
+                            {{ form.metric_name(class="form-control") }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.metric_value.label }}
+                            {{ form.metric_value(class="form-control") }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.unit.label }}
+                            {{ form.unit(class="form-control") }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.date.label }}
+                            {{ form.date(class="form-control") }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.notes.label }}
+                            {{ form.notes(class="form-control", rows=3) }}
+                        </div>
+                        {{ form.submit(class="btn btn-primary") }}
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Progress History</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Sport</th>
+                                    <th>Metric</th>
+                                    <th>Value</th>
+                                    <th>Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for entry in progress_entries %}
+                                <tr>
+                                    <td>{{ entry.date.strftime('%Y-%m-%d') }}</td>
+                                    <td>{{ entry.sport.name }}</td>
+                                    <td>{{ entry.metric_name }}</td>
+                                    <td>{{ entry.metric_value }} {{ entry.unit }}</td>
+                                    <td>{{ entry.notes }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Progress Charts</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for sport in sports %}
+                        <div class="col-md-6">
+                            <h5>{{ sport.name }}</h5>
+                            <div class="chart-container" style="position: relative; height: 300px;">
+                                <canvas id="chart-{{ sport.id }}" width="400" height="300"></canvas>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Initialize our data from template variables
+window.SPORTS_DATA = {{ sports|tojson|safe }};
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@1.0.1/dist/chartjs-adapter-moment.min.js"></script>
+<script src="{{ url_for('static', filename='js/progress-charts.js') }}"></script>
+{% endblock %} 

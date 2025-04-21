@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80">
+  <defs>
+    <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2c7be5" />
+      <stop offset="100%" stop-color="#3cb371" />
+    </linearGradient>
+  </defs>
+  <circle cx="40" cy="40" r="36" fill="white" stroke="url(#logo-gradient)" stroke-width="3" />
+  <g fill="url(#logo-gradient)">
+    <!-- Stylized person in motion -->
+    <circle cx="40" cy="25" r="8" />
+    <path d="M28,38 C28,38 36,35 40,33 C44,35 52,38 52,38 L48,60 L44,50 L40,60 L36,50 L32,60 Z" stroke="url(#logo-gradient)" stroke-width="2" fill="none" />
+    <!-- AI letters -->
+    <path d="M20,67 L22,67 L23.5,62 L26.5,62 L28,67 L30,67 L25,53 L25,53 L20,67 Z M24,60 L25,57 L26,60 L24,60 Z" />
+    <path d="M32,53 L32,67 L34,67 L34,62 L36,62 C38.2,62 40,60.2 40,58 L40,57 C40,54.8 38.2,53 36,53 L32,53 Z M34,55 L36,55 C37.1,55 38,55.9 38,57 L38,58 C38,59.1 37.1,60 36,60 L34,60 L34,55 Z" />
+    <!-- Pulse line -->
+    <polyline points="50,60 52,60 54,56 56,64 58,56 60,60 62,60" fill="none" stroke="url(#logo-gradient)" stroke-width="2" />
+  </g>
+</svg>
